@@ -31,7 +31,7 @@ on:
 
 env:
     # Default values — change these to your preferred defaults or leave empty to require overrides
-    RUBY_VERSION: "3.4.8-slim"
+    RUBY_VERSION: "3.2.9"
     PG_VERSION: "16"
     MYSQL_VERSION: "8.0"
     NODE_VERSION: "18"
