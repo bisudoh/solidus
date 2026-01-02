@@ -1,0 +1,71 @@
+# Builds multi-arch images (amd64 + arm64) from .dockerdev/Dockerfile and pushes to Docker Hub.
+# Requires repository secrets: DOCKERHUB_USERNAME and DOCKERHUB_TOKEN
+name: Build and push multi-arch Docker image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+    IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/solidus
+    DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+    DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+jobs:
+  build-and-push:
+    name: Build and push multi-arch image (amd64 + arm64)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up QEMU (for cross-platform builds)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_PASSWORD }}
+
+      - name: Determine tags
+        id: tags
+        run: |
+          SHORT_SHA=${GITHUB_SHA::7}
+          echo "sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          # Tag 'latest' only for main branch pushes
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "latest=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "latest=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build and push multi-arch image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./.dockerdev
+          file: ./.dockerdev/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ steps.tags.outputs.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+          # optional: enable build cache (speeds up repeated builds)
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Output image info
+        run: |
+          echo "Image pushed:"
+          echo " - ${{ env.IMAGE_NAME }}:${{ steps.tags.outputs.sha }}"
+          if [ "${{ steps.tags.outputs.latest }}" = "true" ]; then
+            echo " - ${{ env.IMAGE_NAME }}:latest"
+          fi
