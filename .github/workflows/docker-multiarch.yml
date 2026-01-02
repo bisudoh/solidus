@@ -7,8 +7,35 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      ruby_version:
+        description: 'RUBY_VERSION (override)'
+        required: false
+        default: ''
+      pg_version:
+        description: 'PG_VERSION (override)'
+        required: false
+        default: ''
+      mysql_version:
+        description: 'MYSQL_VERSION (override)'
+        required: false
+        default: ''
+      node_version:
+        description: 'NODE_VERSION (override)'
+        required: false
+        default: ''
+      bundler_version:
+        description: 'BUNDLER_VERSION (override)'
+        required: false
+        default: ''
 
 env:
+    # Default values — change these to your preferred defaults or leave empty to require overrides
+    RUBY_VERSION: "3.4.8-slim"
+    PG_VERSION: "16"
+    MYSQL_VERSION: "8.0"
+    NODE_VERSION: "18"
+    BUNDLER_VERSION: "2.4.11"
     IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/solidus
     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
     DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -58,6 +85,12 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:${{ steps.tags.outputs.sha }}
             ${{ env.IMAGE_NAME }}:latest
+          build-args: |
+            RUBY_VERSION=${{ inputs.ruby_version || env.RUBY_VERSION }}
+            PG_VERSION=${{ inputs.pg_version || env.PG_VERSION }}
+            MYSQL_VERSION=${{ inputs.mysql_version || env.MYSQL_VERSION }}
+            NODE_VERSION=${{ inputs.node_version || env.NODE_VERSION }}
+            BUNDLER_VERSION=${{ inputs.bundler_version || env.BUNDLER_VERSION }}
           # optional: enable build cache (speeds up repeated builds)
           cache-from: type=gha
           cache-to: type=gha,mode=max
