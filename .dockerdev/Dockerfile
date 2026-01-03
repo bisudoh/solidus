@@ -58,4 +58,4 @@ RUN mkdir -p /home/$APP_USER/history
 
 WORKDIR /home/$APP_USER/app
 
-COPY Gemfile Rakefile README.md GOVERNANCE.md .rubocop.yml solidus.gemspec Procfile.dev ./
+COPY Gemfile ./
