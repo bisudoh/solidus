@@ -57,3 +57,5 @@ USER $APP_USER
 RUN mkdir -p /home/$APP_USER/history
 
 WORKDIR /home/$APP_USER/app
+
+COPY Gemfile Gemfile.lock ./
