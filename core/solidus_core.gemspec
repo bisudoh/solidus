@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
     f.match(%r{^(spec|bin)/})
   end
 
-  s.required_ruby_version = '>= 3.1.0'
+  s.required_ruby_version = '>= 3.2.0'
   s.required_rubygems_version = '>= 1.8.23'
 
   %w[
@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   ].each do |rails_dep|
     s.add_dependency rails_dep, [
       ">= #{Spree.minimum_required_rails_version}",
-      "< 8.1.0.beta1"
+      "< 8.2"
     ]
   end
 
@@ -47,7 +47,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'kt-paperclip', ['>= 6.3', '< 8']
   s.add_dependency 'psych', ['>= 4.0.1', '< 6.0']
   s.add_dependency 'ransack', ['~> 4.0', '< 5']
-  s.add_dependency 'sprockets-rails', '!= 3.5.0'
   s.add_dependency 'state_machines', ['~> 0.6', '< 0.10.0']
   s.add_dependency 'state_machines-activerecord', ['~> 0.6', '< 0.10.0']
   s.add_dependency 'omnes', '~> 0.2.2'
